@@ -181,7 +181,7 @@
             arrDirectionY.forEach(dir =>{
                 coord = this.getWillChangeCoordEnty(dir,"y")
                 
-                if(coord >= 0 && coord <= 39){
+                if(coord >= 0 && coord <= 23){
                     if(arr_map[coord][this.enty.x] === enem){
                         arrAttack.push({
                         x:this.enty.x,
@@ -194,7 +194,7 @@
              arrDirectionX.forEach(dir =>{
                 coord = this.getWillChangeCoordEnty(dir,"x")
                  console.log(coord, this.enty)
-                if(coord >= 0 && coord <= 23){
+                if(coord >= 0 && coord <= 39){
                     if(arr_map[this.enty.y][coord] === enem){
                         arrAttack.push({
                         x:coord,
