@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    
+    <style>
+        
+        .air{
+           background-size: cover;
+    background-image: url(images/tile-.png);
+    background-position: center;
+        }
+        .table_corect{
+            border-collapse:collapse;
+            width: 75%;
+            min-width: 700px;
+            border: 3px solid;
+        }
+        .heath{
+            width: 20px;
+            height: 20px;
+            background-image: url(images/tile-HP.png);
+            background-size: cover;
+            margin: auto;
+        }
+        .sword{
+            width: 20px;
+            height: 20px;
+            background-image: url(images/tile-SW.png);
+            background-size: cover;
+            margin: auto;
+        }
+        .enemie{
+            width: 20px;
+            height: 20px;
+            background-image: url(images/tile-E.png);
+            background-size: cover;
+            margin: auto;
+        }
+        .man{
+            width: 20px;
+            height: 20px;
+            background-image: url(images/tile-P.png);
+            background-size: cover;
+            margin: auto;
+        }
+        .wall{
+           background-size: cover;
+    background-image: url(images/tile-W.png);
+    background-position: center;
+        }
+        .td_corect{
+             width: 20px;
+            height: 20px;   
+        }
+</style>
+</head>
+
+<body>
+    <div class="hp_man"><p>HP : <span id="countHp">20</span></p></div>
+    <div class="attack_man"><p>Attack : <span id="countAttack">1</span></p></div>
+    
+    <script>
+    function createTable(tableData) {
+                  var table = document.createElement('table');
+                    table.classList.add("table_corect")
+                  var tableBody = document.createElement('tbody');
+                    let y = 0
+                  tableData.forEach(function(rowData) {
+                    var row = document.createElement('tr');
+                    
+                    
+                    
+                    rowData.forEach(function(cellData) {
+                      var cell = document.createElement('td');
+                        
+                        const heath = document.createElement('div')
+                        heath.classList.add("heath")
+                        
+                        const sword = document.createElement('div')
+                        sword.classList.add("sword")
+                        
+                        const enemie = document.createElement('div')
+                        enemie.classList.add("enemie")
+                        
+                         const man = document.createElement('div')
+                        man.classList.add("man")
+                        
+                        cell.classList.add("td_corect")
+                        if(cellData){
+                            if(cellData === "h"){
+                                cell.appendChild(heath)
+                            }else if(cellData === "s"){
+                                cell.appendChild(sword)
+                            }else if(cellData ==="e"){
+                                cell.appendChild(enemie) 
+                            }else if(cellData === "m"){
+                                cell.appendChild(man)
+                            }
+                            
+                            cell.classList.add("air")
+                        
+                        }else{
+                            cell.classList.add("wall")
+                        }
+                      
+                      row.appendChild(cell);
+                    });
+
+                    tableBody.appendChild(row);
+                  });
+
+                  table.appendChild(tableBody);
+                  document.body.appendChild(table);
+            }
+    class Enty{
+            willCoord = {}
+            
+            constructor(enty,nodeEnty,mark){
+                this.enty = enty
+                this.node = nodeEnty
+                this.mark = mark
+            }
+            moveEnty(){
+                     document.getElementsByTagName("tbody")[0].childNodes[this.enty.y].childNodes[this.enty.x].appendChild(this.node)
+                     arr_map[this.enty.y][this.enty.x] = this.mark
+            }  
+            getWillChangeCoordEnty(move, direction){
+                    if(direction === "y"){
+                        if (move === "up"){
+                            
+                            return this.enty.y - 1}
+                        else if(move === "down"){
+                             
+                            return this.enty.y + 1
+                            }else{
+                               
+                            return this.enty.y
+                            }
+                    }else if(direction === "x"){
+                        if(move === "right"){
+                           
+                        return this.enty.x + 1
+                     }else if(move === "left") {
+                        
+                        return this.enty.x - 1
+                     }else{
+                         
+                            return this.enty.x
+                            }
+                        
+                    }
+                    
+                }
+            setCoordEnty(){
+                arr_map[this.enty.y][this.enty.x] = 1
+                this.enty.x = this.willCoord.x
+                this.enty.y = this.willCoord.y
+            }
+        
+            moveInMap(move){
+            this.willCoord.x = this.getWillChangeCoordEnty(move,"x")
+            this.willCoord.y = this.getWillChangeCoordEnty(move,"y")
+                
+            if (this.willCoord.x < 0 || this.willCoord.x >39 || this.willCoord.y < 0 || this.willCoord.y > 23){
+                return
+            }
+            
+            if(arr_map[this.willCoord.y][this.willCoord.x] === 1){
+                        this.setCoordEnty()
+                        this.moveEnty()          
+                    }
+        }
+
+         entyAttak(enem){
+            let arrAttack = []
+            let coord
+            let arrDirectionY = ["up","down"]
+            let arrDirectionX = ["right","left"]
+            arrDirectionY.forEach(dir =>{
+                coord = this.getWillChangeCoordEnty(dir,"y")
+                
+                if(coord >= 0 && coord <= 39){
+                    if(arr_map[coord][this.enty.x] === enem){
+                        arrAttack.push({
+                        x:this.enty.x,
+                        y:coord
+                            })
+                    }
+                }
+                
+            })
+             arrDirectionX.forEach(dir =>{
+                coord = this.getWillChangeCoordEnty(dir,"x")
+                if(coord >= 0 && coord <= 23){
+                    if(arr_map[this.enty.y][coord] === enem){
+                        arrAttack.push({
+                        x:coord,
+                        y:this.enty.y
+                            })
+                    }
+                }
+                
+            })
+           
+            return arrAttack
+        }
+        }
+    class Leaf{
+            leftchild = null
+            rightchild = null
+            MIN_LEAF_SIZE = 6
+            room = null
+            halls = []
+            constructor(x,y,width, height){
+                this.x = x
+                this.y = y
+                this.width = width
+                this.height = height
+            }
+            
+            split(){
+                let splitH, max, split
+                if (this.leftchild != null || this.rightchild != null){
+                    return false // уже сплитанули 
+                   
+                }
+                
+                splitH = Math.random() > 0.5
+                if ( this.width > this.height && (this.width / this.height) >= 1.25){
+                    splitH = false
+                } else if ( this.height > this.width && (this.height / this.width) >= 1.25){
+                    splitH = true
+                }
+                
+                max = (splitH ? this.height : this.width) - this.MIN_LEAF_SIZE
+                if (max <= this.MIN_LEAF_SIZE){
+                    return false
+                   
+                }
+                
+                 
+                split = Math.floor(Math.random() * (max - this.MIN_LEAF_SIZE) + this.MIN_LEAF_SIZE)
+                
+                if (splitH){
+                    this.leftchild = new Leaf(this.x,this.y,this.width, split)
+                    this.rightchild = new Leaf(this.x,this.y + split,this.width, this.height - split)
+                    
+                }else{
+                    this.leftchild = new Leaf(this.x,this.y,split, this.height)
+                    this.rightchild = new Leaf(this.x + split,this.y ,this.width - split, this.height)
+                }
+                
+                return true
+            }
+        
+            corectSize(size){
+                if (size > 8){
+                    return 8
+                }
+                return size
+            }
+        
+            creatRooms(){
+                
+                if(this.leftchild != null || this.rightchild != null){
+                    if(this.leftchild != null){
+                        this.leftchild.creatRooms()
+                    }
+                    if(this.rightchild != null){
+                        this.rightchild.creatRooms()
+                    }
+                    
+                    if(this.leftchild != null && this.rightchild != null){
+                        this.createHall(this.leftchild.getRoom(),this.rightchild.getRoom())
+                    }
+                    
+                    
+                }else{
+                    let maxWidthRoom = this.corectSize(this.width)
+                    let maxHeightRoom = this.corectSize(this.height)
+                    
+                    
+                    const roomSize = {
+                        width: Math.floor(Math.random() * (maxWidthRoom - 3) + 3),
+                        height:Math.floor(Math.random() * (maxHeightRoom - 3) + 3)
+                    }
+                    
+                    const roomPos = {
+                        x: Math.floor(Math.random() * ((this.width - roomSize.width - 1) - 1) + 1),
+                        y: Math.floor(Math.random() * ((this.height - roomSize.height - 1) - 1) + 1)
+                    }
+                    
+                    this.room = {
+                        x: (this.x + roomPos.x),
+                        y: (this.y + roomPos.y),
+                        width: roomSize.width,
+                        height: roomSize.height
+                    }
+                    
+                }
+                
+            }
+            getRoom(){
+                if (this.room != null){
+                    return this.room
+                }else{
+                    let lRoom
+                    let rRoom
+                    if(this.leftchild != null){
+                        lRoom = this.leftchild.getRoom()
+                    }
+                    if(this.rightchild != null){
+                        rRoom = this.rightchild.getRoom()
+                    }
+                    if(rRoom === null && lRoom === null){
+                        return null
+                    }else if(rRoom === null){
+                        return lRoom
+                    }else if(lRoom === null){
+                        return rRoom
+                    }else if(Math.random() > 0.5){
+                        return rRoom
+                    }else{
+                        return lRoom
+                    }
+                    
+                }
+                
+            }
+            createHall(l,r){
+                
+                const point1 = {
+                    x: Math.floor(Math.random() * (l.x+l.width - 2 - l.x+1) + l.x+1),
+                    y: Math.floor(Math.random() * (l.y+l.height - 2 - l.y+1) + l.y+1)
+                }
+                 const point2 = {
+                    x: Math.floor(Math.random() * (r.x+r.width - 2 - r.x+1) + r.x+1),
+                    y: Math.floor(Math.random() * (r.y+r.height - 2 - r.y+1) + r.y+1)
+                }
+                let w = point2.x - point1.x
+                let h = point2.y - point1.y
+                
+                if(w<0){
+                    if(h<0){
+                        if(Math.random() < 0.5){
+                            this.halls.push({
+                                x:point2.x,
+                                y:point1.y,
+                                w:Math.abs(w),
+                                h:1
+                            })
+                            this.halls.push({
+                                x:point2.x,
+                                y:point2.y,
+                                w:1,
+                                h:Math.abs(h)
+                                
+                            })
+                        }else{
+                            this.halls.push({
+                                x:point1.x,
+                                y:point2.y,
+                                w:1,
+                                h:Math.abs(h)
+                            })
+                            this.halls.push({
+                                x:point2.x,
+                                y:point2.y,
+                                w:Math.abs(w),
+                                h:1
+                                
+                            })
+                            
+                        }
+                    }else if(h>0){
+                        if(Math.random() < 0.5){
+                            this.halls.push({
+                                x:point2.x,
+                                y:point1.y,
+                                w:Math.abs(w),
+                                h:1
+                            })
+                            this.halls.push({
+                                x:point2.x,
+                                y:point1.y,
+                                w:1,
+                                h:Math.abs(h)
+                                
+                            })
+                        }else{
+                            this.halls.push({
+                                x:point1.x,
+                                y:point1.y,
+                                w:1,
+                                h:Math.abs(h)
+                            })
+                            this.halls.push({
+                                x:point2.x,
+                                y:point2.y,
+                                w:Math.abs(w),
+                                h:1
+                                
+                            })
+                            
+                        }
+                    }else{
+                        this.halls.push({
+                            x:point2.x,
+                            y:point2.y,
+                            w:Math.abs(w),
+                            h:1
+                        })
+                    }
+                    
+                }else if (w>0){
+                    
+                    
+                    
+                    if(h<0){
+                        if(Math.random() < 0.5){
+                            this.halls.push({
+                                x:point1.x,
+                                y:point2.y,
+                                w:Math.abs(w),
+                                h:1
+                            })
+                            this.halls.push({
+                                x:point1.x,
+                                y:point2.y,
+                                w:1,
+                                h:Math.abs(h)
+                            })
+                            
+                        }else{
+                            this.halls.push({
+                                x:point1.x,
+                                y:point1.y,
+                                w:Math.abs(w),
+                                h:1
+                            })
+                            this.halls.push({
+                                x:point2.x,
+                                y:point2.y,
+                                w:1,
+                                h:Math.abs(h)
+                            })
+                            
+                            
+                            
+                        }
+                        
+                        
+                    }else if (h>0){
+                        
+                        if(Math.random() < 0.5){
+                            this.halls.push({
+                                x:point1.x,
+                                y:point1.y,
+                                w:Math.abs(w),
+                                h:1
+                            })
+                            this.halls.push({
+                                x:point2.x,
+                                y:point1.y,
+                                w:1,
+                                h:Math.abs(h)
+                            })
+                            
+                        }else{
+                            this.halls.push({
+                                x:point1.x,
+                                y:point2.y,
+                                w:Math.abs(w),
+                                h:1
+                            })
+                            this.halls.push({
+                                x:point1.x,
+                                y:point1.y,
+                                w:1,
+                                h:Math.abs(h)
+                            })
+                            
+                            
+                            
+                        }
+                        
+                        
+                    }else{
+                        this.halls.push({
+                            x:point1.x,
+                            y:point1.y,
+                            w:Math.abs(w),
+                            h:1
+                        })
+                        
+                    }
+                    
+                    
+                    
+                    
+                }else{
+                    
+                    if(h<0){
+                        this.halls.push({
+                            x:point2.x,
+                            y:point2.y,
+                            w:1,
+                            h:Math.abs(h)
+                        })
+                    }else if (h>0){
+                        this.halls.push({
+                            x:point1.x,
+                            y:point1.y,
+                            w:1,
+                            h:Math.abs(h)
+                        })
+                    }
+                    
+                    
+                }
+            }
+            
+        }
+        
+        
+        const MAX_LEAF_SIZE = 16
+        let leafs = []
+        let l
+        let root_leaf = new Leaf(0,0,40,24) 
+        leafs.push(root_leaf)
+        let did_split = true
+        while(did_split){
+            did_split = false
+            leafs.forEach( (l) => {
+                if (l.leftchild == null && l.rightchild == null){
+                    if(l.width > MAX_LEAF_SIZE || l.height > MAX_LEAF_SIZE){
+                        
+                        if(l.split()){
+                            leafs.push(l.leftchild)
+                            leafs.push(l.rightchild)
+                            did_split = true
+                        }
+                        
+                        
+                        
+                    }
+                }
+                
+            })
+        }
+        
+        root_leaf.creatRooms()
+        
+        
+        
+        let arr_map = [];
+        for (let i = 0; i< 24; i++){
+            
+            arr_map.push([])
+            for(let j =0;j<40; j++){
+                arr_map[i].push(0)
+            }
+        }
+        
+        
+        let countSword = 2
+        let countHeath = 10
+        let countEnemies = 10
+        let countHero = 1
+        let man = {
+            heath:20,
+            attack:1
+        }
+        let posMan = {}    
+        let enemies = []
+        let willCordMan = {}
+        
+        leafs.forEach( elem =>{
+            if (elem.rightchild == null && elem.leftchild == null){
+                let hRoom = 0
+                let sRoom = 0
+                let eRoom = 0
+                arr_map[elem.room.y][elem.room.x] = 1
+                let h = elem.room.y + elem.room.height
+                let w = elem.room.x + elem.room.width
+                
+                for (let j = elem.room.y; j < h ; j++){
+                    
+                    for (let i = elem.room.x; i < w ;i++){
+                        if (countHero === 1 && (i+j) % 13 === 0){
+                            arr_map[j][i] = "m"
+                            man.x = i
+                            man.y = j
+                            countHero -= 1
+                           
+                        }else if(Math.random() < 0.06 && countHeath != 0 && hRoom <2 ){
+                            
+                            arr_map[j][i] = "h"
+                            countHeath -= 1
+                            hRoom +=1
+                           
+                           
+                        }else if(Math.random() < 0.02 && countSword != 0 && sRoom <1){
+                            arr_map[j][i] = "s"
+                            countSword -= 1  
+                           sRoom +=1
+                        }else if(Math.random() < 0.2 && countEnemies != 0 && eRoom < 2){
+                            arr_map[j][i] = "e"
+                            countEnemies -= 1  
+                            eRoom +=1
+                            const objEnem = new Enty({
+                                x:i,
+                                y:j,
+                                heath: 10
+                                },null,"e")
+                            enemies.push(objEnem)
+                        }else{
+                            arr_map[j][i] = 1
+                        }
+                        
+                        
+                        
+                      
+       
+                    }
+                    
+                }
+                
+            }
+            
+            
+            
+        })
+        
+            
+        
+        leafs.forEach( elem => {
+             if (elem.halls != []){
+                elem.halls.forEach(hall =>{
+                    if (hall.w === 1){
+                        
+                        for(let i = hall.y; i <= hall.y + hall.h; i++){
+                            if(Math.random() < 0.2 && countHeath != 0 && arr_map[i][hall.x] === 0 ){
+                                arr_map[i][hall.x] = "h"
+                                countHeath -=1
+                                
+                               
+                            }else if(Math.random() < 0.3 && countSword != 0 && arr_map[i][hall.x] === 0 ){
+                                arr_map[i][hall.x] = "s"
+                                countSword -=1
+                               
+                            }else if(Math.random() < 0.3 && countEnemies != 0 && arr_map[i][hall.x] === 0 ){
+                                arr_map[i][hall.x] = "e"
+                                countEnemies -=1
+                                const objEnem = new Enty({
+                                x:hall.x,
+                                y:i,
+                                heath: 10
+                                },null,"e")
+                                enemies.push(objEnem)
+                               
+                            }else if ( arr_map[i][hall.x] === 0 ){
+                                arr_map[i][hall.x] = 1
+                            }
+                            
+                        }
+                        
+                    }else {
+                        for(let i = hall.x; i <= hall.x + hall.w; i++){
+                            if ( arr_map[hall.y][i] === 0 ){
+                                 arr_map[hall.y][i] = 1
+                            }
+                           
+                        }
+                    }
+                    
+                })
+             
+             }
+        })
+        
+        
+        createTable(arr_map)
+        enemies.forEach(enem => {     
+            enem.node = document.getElementsByTagName("tbody")[0].childNodes[enem.enty.y].childNodes[enem.enty.x].childNodes[0]
+        })
+        function movesEnemis(){
+            
+            enemies.forEach(enem =>{
+                
+                if(Math.random() < 0.5){ // выбираем ли врага
+                    if(Math.random() < 0.5){ // выбираем ось
+                        if(Math.random() < 0.5){ // выбираем направление
+                        enem.moveInMap("up")
+                        }else{
+                        enem.moveInMap("down")
+                        }
+                        
+                        
+                    }else{
+                         if(Math.random() < 0.5){
+                        enem.moveInMap("right")
+                        }else{
+                        enem.moveInMap("left")
+                        }
+                    }
+                }
+                
+                let arrAttackEnem = enem.entyAttak("m")
+                ObjMan.enty.heath -= arrAttackEnem.length
+                document.getElementById("countHp").innerHTML = ObjMan.enty.heath
+                
+                if(ObjMan.enty.heath === 0){
+                    ObjMan.node.remove()
+                }
+                
+            })
+        }
+        
+        
+        class ManEnty extends Enty{
+            
+            moveInMap(move){
+                this.willCoord.x = this.getWillChangeCoordEnty(move,"x")
+                this.willCoord.y = this.getWillChangeCoordEnty(move,"y")
+                
+                if (this.willCoord.x < 0 || this.willCoord.x >39 || this.willCoord.y < 0 || this.willCoord.y > 23){
+                    return
+                }
+
+                if(arr_map[this.willCoord.y][this.willCoord.x] === 1){
+                            this.setCoordEnty()
+                            this.moveEnty()          
+                }else if(arr_map[this.willCoord.y][this.willCoord.x] === "h"){
+                        
+                        this.setCoordEnty()
+                        this.heathRemove()
+                        this.moveEnty()
+                        
+                        
+                }else if(arr_map[this.willCoord.y][this.willCoord.x] === "s"){
+                        
+                        this.setCoordEnty()
+                        this.swordRemove()
+                        this.moveEnty()
+                    }
+            }
+            
+        heathRemove(){
+            
+            this.enty.heath +=2
+            document.getElementById("countHp").innerHTML = ObjMan.enty.heath
+            document.getElementsByTagName("tbody")[0].childNodes[this.enty.y].childNodes[this.enty.x].children[0].remove()
+        }
+            
+        swordRemove(){
+            this.enty.attack += 1
+            document.getElementById("countAttack").innerHTML = ObjMan.enty.attack
+            document.getElementsByTagName("tbody")[0].childNodes[this.enty.y].childNodes[this.enty.x].children[0].remove()
+        }
+            
+        }
+        
+        
+        
+        
+        const manElem = document.getElementsByClassName("man")[0]
+
+
+        const ObjMan = new ManEnty(man,manElem,"m")
+        
+        
+        
+        
+        
+        
+        
+        
+        addEventListener("keydown", function(event) {
+            
+            if(ObjMan.enty.y >= 0 && ObjMan.enty.y<=23 ){
+                if(event.keyCode === 87){
+                    ObjMan.moveInMap("up")
+                }else if(event.keyCode === 83){
+                    ObjMan.moveInMap("down")
+                }
+                
+            }
+            if(ObjMan.enty.x >= 0 && ObjMan.enty.x<=39){
+                if(event.keyCode === 68){
+                    ObjMan.moveInMap("right")
+                }else if(event.keyCode === 65){
+                    ObjMan.moveInMap("left")
+                }
+            }
+            
+
+            if(event.keyCode === 32){
+                let arrAttackMan = []
+                clearInterval(movesInterval)
+                arrAttackMan =  ObjMan.entyAttak("e")
+                console.log(arrAttackMan)
+                let delEnem = []
+                enemies.forEach((en,index)=> {
+                    arrAttackMan.forEach(eAttack => {
+                        if(en.enty.x === eAttack.x && en.enty.y === eAttack.y){
+                            en.enty.heath -= ObjMan.enty.attack
+                            if(en.enty.heath <= 0){
+                                en.node.remove()
+                                arr_map[en.enty.y][en.enty.x] = 1
+                                delEnem.push(index)
+                                
+                            }
+                        }
+                        
+                        
+                    })
+                })
+                delEnem.forEach(del =>{
+                    enemies.splice(del,1)
+                })
+                movesInterval = setInterval(movesEnemis,2000)
+                
+               }
+           
+          });
+        
+        
+        let movesInterval = setInterval(movesEnemis,2000)
+        
+    </script>
+</body>
+</html>
