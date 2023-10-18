@@ -32,11 +32,13 @@
             margin: auto;
         }
         .enemie{
+
             width: 20px;
             height: 20px;
             background-image: url(images/tile-E.png);
             background-size: cover;
             margin: auto;
+            transition-duration: 200ms;
         }
         .man{
             width: 20px;
@@ -44,6 +46,7 @@
             background-image: url(images/tile-P.png);
             background-size: cover;
             margin: auto;
+             transition-duration: 200ms;
         }
         .wall{
            background-size: cover;
@@ -53,6 +56,9 @@
         .td_corect{
              width: 20px;
             height: 20px;   
+        }
+        .attack-anim{
+            transform: scale(0.8) rotate(10deg);
         }
 </style>
 </head>
@@ -711,6 +717,10 @@
                 
                 let arrAttackEnem = enem.entyAttak("m")
                 ObjMan.enty.heath -= arrAttackEnem.length
+                if(arrAttackEnem.length > 0){
+                    ObjMan.node.classList.add("attack-anim")
+                setTimeout(() =>{ObjMan.node.classList.remove("attack-anim")}, 100)
+                }
                 document.getElementById("countHp").innerHTML = ObjMan.enty.heath
                 
                 if(ObjMan.enty.heath === 0){
@@ -808,8 +818,12 @@
                     arrAttackMan.forEach(eAttack => {
                         if(en.enty.x === eAttack.x && en.enty.y === eAttack.y){
                             en.enty.heath -= ObjMan.enty.attack
+                            en.node.classList.add("attack-anim")
+                            setTimeout(() =>{en.node.classList.remove("attack-anim")}, 100)
+                            
                             if(en.enty.heath <= 0){
                                 en.node.remove()
+                                
                                 arr_map[en.enty.y][en.enty.x] = 1
                                 delEnem.push(index)
                                 
@@ -818,10 +832,12 @@
                         
                         
                     })
+                    
                 })
                 delEnem.forEach(del =>{
                     enemies.splice(del,1)
                 })
+                
                 movesInterval = setInterval(movesEnemis,2000)
                 
                }
