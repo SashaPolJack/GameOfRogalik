@@ -199,7 +199,7 @@
             })
              arrDirectionX.forEach(dir =>{
                 coord = this.getWillChangeCoordEnty(dir,"x")
-                 console.log(coord, this.enty)
+                
                 if(coord >= 0 && coord <= 39){
                     if(arr_map[this.enty.y][coord] === enem){
                         arrAttack.push({
@@ -694,7 +694,7 @@
             enem.node = document.getElementsByTagName("tbody")[0].childNodes[enem.enty.y].childNodes[enem.enty.x].childNodes[0]
         })
         function movesEnemis(){
-            
+            console.log(enemies)
             enemies.forEach(enem =>{
                 
                 if(Math.random() < 0.5){ // выбираем ли врага
@@ -723,7 +723,7 @@
                 }
                 document.getElementById("countHp").innerHTML = ObjMan.enty.heath
                 
-                if(ObjMan.enty.heath === 0){
+                if(ObjMan.enty.heath <= 0){
                     ObjMan.node.remove()
                 }
                 
@@ -812,7 +812,7 @@
                 let arrAttackMan = []
                 clearInterval(movesInterval)
                 arrAttackMan =  ObjMan.entyAttak("e")
-                console.log(arrAttackMan)
+                
                 let delEnem = []
                 enemies.forEach((en,index)=> {
                     arrAttackMan.forEach(eAttack => {
@@ -825,7 +825,7 @@
                                 en.node.remove()
                                 
                                 arr_map[en.enty.y][en.enty.x] = 1
-                                delEnem.push(index)
+                                delEnem.push(en)
                                 
                             }
                         }
@@ -834,10 +834,18 @@
                     })
                     
                 })
-                delEnem.forEach(del =>{
-                    enemies.splice(del,1)
-                })
+//                for(let i = 0; i<delEnem.length;i++){
+//                    enemies.splice(delEnem[i],1)
+//                    delEnem.splice(i,1)
+//                    delEnem.forEach(del =>{
+//                        del - 1
+//                    })
+//                }
                 
+                delEnem.forEach(del =>{
+                    enemies.splice(enemies.indexOf(del),1)
+                })
+                console.log(enemies)
                 movesInterval = setInterval(movesEnemis,2000)
                 
                }
